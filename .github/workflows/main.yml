@@ -23,23 +23,23 @@ jobs:
         
     - name: Install zlib
       run: |
-        .\vcpkg\vcpkg install zlib:x64-windows-static
+        .\vcpkg\vcpkg install zlib:x64-windows
         
     - name: Install zstd
       run: |
-        .\vcpkg\vcpkg install zstd:x64-windows-static
+        .\vcpkg\vcpkg install zstd:x64-windows
 
     - name: OpenSSL
       run: |
-        .\vcpkg\vcpkg install openssl:x64-windows-static
+        .\vcpkg\vcpkg install openssl:x64-windows
 
     - name: MySQL
       run: |
-        .\vcpkg\vcpkg install libmysql:x64-windows-static
+        .\vcpkg\vcpkg install libmysql:x64-windows
 
     - name: PostgreSQL
       run: |
-        .\vcpkg\vcpkg install libpq:x64-windows-static
+        .\vcpkg\vcpkg install libpq:x64-windows
 
     - name: Copy libraries and Windows SDK
       run: |
