@@ -29,6 +29,10 @@ jobs:
       run: |
         .\vcpkg\vcpkg install zstd:x64-windows-static
 
+    - name: OpenSSL
+      run: |
+        .\vcpkg\vcpkg install openssl:x64-windows-static
+
     - name: Copy Windows SDK libraries
       run: |
         mkdir libs
