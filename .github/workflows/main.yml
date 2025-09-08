@@ -61,7 +61,7 @@ jobs:
         
     - name: List installed libraries
       run: |
-        dir vcpkg\installed\x64-windows-static\lib\
+        dir vcpkg\installed\x64-windows\lib\
 
     - name: List all libraries
       run: |
@@ -71,13 +71,13 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: zlib-windows-lib
-        path: vcpkg/installed/x64-windows-static/lib/zlib.lib
+        path: vcpkg/installed/x64-windows/lib/zlib.lib
         
     - name: Upload zstd library
       uses: actions/upload-artifact@v4
       with:
         name: zstd-windows-lib
-        path: vcpkg/installed/x64-windows-static/lib/zstd.lib
+        path: vcpkg/installed/x64-windows/lib/zstd.lib
         
     - name: Upload all libraries
       uses: actions/upload-artifact@v4
