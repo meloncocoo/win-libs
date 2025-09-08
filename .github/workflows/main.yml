@@ -33,14 +33,29 @@ jobs:
       run: |
         .\vcpkg\vcpkg install openssl:x64-windows-static
 
-    - name: Copy Windows SDK libraries
+    - name: MySQL
+      run: |
+        .\vcpkg\vcpkg install libmysql:x64-windows-static
+
+    - name: PostgreSQL
+      run: |
+        .\vcpkg\vcpkg install libpq:x64-windows-static
+
+    - name: Copy libraries and Windows SDK
       run: |
         mkdir libs
+        # 复制 vcpkg 安装的库
         copy vcpkg\installed\x64-windows-static\lib\*.lib libs\
+        
         # 复制 Windows SDK 库
-        copy "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\ws2_32.lib" libs\
-        copy "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\wsock32.lib" libs\
-        copy "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\dnsapi.lib" libs\
+        $sdkPath = "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\"
+        if (Test-Path $sdkPath) {
+            copy "$sdkPath\ws2_32.lib" libs\
+            copy "$sdkPath\wsock32.lib" libs\
+            copy "$sdkPath\dnsapi.lib" libs\
+            copy "$sdkPath\netapi32.lib" libs\
+        }
+        
         # 创建 resolv.lib 的符号链接
         copy libs\ws2_32.lib libs\resolv.lib
         
