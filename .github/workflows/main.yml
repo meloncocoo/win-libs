@@ -28,6 +28,17 @@ jobs:
     - name: Install zstd
       run: |
         .\vcpkg\vcpkg install zstd:x64-windows-static
+
+    - name: Copy Windows SDK libraries
+      run: |
+        mkdir libs
+        copy vcpkg\installed\x64-windows-static\lib\*.lib libs\
+        # 复制 Windows SDK 库
+        copy "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\ws2_32.lib" libs\
+        copy "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\wsock32.lib" libs\
+        copy "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\dnsapi.lib" libs\
+        # 创建 resolv.lib 的符号链接
+        copy libs\ws2_32.lib libs\resolv.lib
         
     - name: List installed libraries
       run: |
