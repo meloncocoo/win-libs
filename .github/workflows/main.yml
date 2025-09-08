@@ -43,7 +43,11 @@ jobs:
     - name: List installed libraries
       run: |
         dir vcpkg\installed\x64-windows-static\lib\
-        
+
+    - name: List all libraries
+      run: |
+        dir libs\
+
     - name: Upload zlib library
       uses: actions/upload-artifact@v4
       with:
@@ -60,4 +64,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: windows-libs
-        path: vcpkg/installed/x64-windows-static/lib/
+        path: libs/
