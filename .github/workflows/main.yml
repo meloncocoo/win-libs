@@ -35,7 +35,7 @@ jobs:
         
     - name: Install zlib
       run: |
-        .\vcpkg\vcpkg install zlib:x64-windows-static
+        .\vcpkg install zlib:x64-windows-static
         
     - name: Install zstd
       run: |
