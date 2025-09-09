@@ -60,7 +60,7 @@ jobs:
         copy libs\libssl.lib libs\ssl.lib
         
         # 重命名 MySQL 库以匹配 Rust 期望的命名
-        copy libs\libmysql.lib libs\mysqlclient.lib
+        # copy libs\libmysql.lib libs\mysqlclient.lib
         
         # 复制 Windows SDK 库
         $sdkPath = "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\"
