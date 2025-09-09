@@ -15,11 +15,27 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+    - name: Cache vcpkg
+      uses: actions/cache@v4
+      with:
+        path: |
+          vcpkg/installed
+          vcpkg/buildtrees
+          vcpkg/downloads
+        key: vcpkg-${{ hashFiles('**/Cargo.toml') }}-${{ runner.os }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-
+          vcpkg-
+      
     - name: Install vcpkg
       run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        .\bootstrap-vcpkg.bat
+        if (-not (Test-Path "vcpkg")) {
+          git clone https://github.com/Microsoft/vcpkg.git
+          cd vcpkg
+          .\bootstrap-vcpkg.bat
+        } else {
+          cd vcpkg
+        }
         
     - name: Install zlib
       run: |
@@ -28,24 +44,28 @@ jobs:
     - name: Install zstd
       run: |
         .\vcpkg\vcpkg install zstd:x64-windows
-
-    - name: OpenSSL
+        
+    - name: Install OpenSSL
       run: |
         .\vcpkg\vcpkg install openssl:x64-windows
-
-    - name: MySQL
+        
+    - name: Install MySQL
       run: |
         .\vcpkg\vcpkg install libmysql:x64-windows
-
-    - name: PostgreSQL
+        
+    - name: Install PostgreSQL
       run: |
         .\vcpkg\vcpkg install libpq:x64-windows
-
+        
     - name: Copy libraries and Windows SDK
       run: |
         mkdir libs
         # 复制 vcpkg 安装的库
         copy vcpkg\installed\x64-windows\lib\*.lib libs\
+        
+        # 重命名 OpenSSL 库以匹配 Rust 期望的命名
+        copy libs\libcrypto.lib libs\crypto.lib
+        copy libs\libssl.lib libs\ssl.lib
         
         # 复制 Windows SDK 库
         $sdkPath = "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\"
@@ -62,11 +82,13 @@ jobs:
     - name: List installed libraries
       run: |
         dir vcpkg\installed\x64-windows\lib\
-
+        
     - name: List all libraries
       run: |
         dir libs\
-
+        echo "=== Library files ==="
+        Get-ChildItem libs\*.lib | ForEach-Object { Write-Host $_.Name }
+        
     - name: Upload zlib library
       uses: actions/upload-artifact@v4
       with:
