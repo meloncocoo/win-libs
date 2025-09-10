@@ -14,40 +14,40 @@ jobs:
         cd vcpkg
         .\bootstrap-vcpkg.bat
  
-    - name: Cache vcpkg
-      uses: actions/cache@v4
-      with:
-        path: |
-          vcpkg/installed
-          vcpkg/buildtrees
-          vcpkg/downloads
-        key: vcpkg-${{ hashFiles('**/Cargo.toml') }}-${{ runner.os }}
-        restore-keys: |
-          vcpkg-${{ runner.os }}-
-          vcpkg-
+    # - name: Cache vcpkg
+    #   uses: actions/cache@v4
+    #   with:
+    #     path: |
+    #       vcpkg/installed
+    #       vcpkg/buildtrees
+    #       vcpkg/downloads
+    #     key: vcpkg-${{ hashFiles('**/Cargo.toml') }}-${{ runner.os }}
+    #     restore-keys: |
+    #       vcpkg-${{ runner.os }}-
+    #       vcpkg-
                
     - name: Checkout code
       uses: actions/checkout@v4
               
-    - name: Install zlib
-      run: |
-        .\vcpkg\vcpkg.exe install zlib:x64-windows-static
+    # - name: Install zlib
+    #   run: |
+    #     .\vcpkg\vcpkg.exe install zlib:x64-windows-static
         
-    - name: Install zstd
-      run: |
-        .\vcpkg\vcpkg install zstd:x64-windows-static
+    # - name: Install zstd
+    #   run: |
+    #     .\vcpkg\vcpkg install zstd:x64-windows-static
         
-    - name: Install OpenSSL
-      run: |
-        .\vcpkg\vcpkg install openssl:x64-windows-static
+    # - name: Install OpenSSL
+    #   run: |
+    #     .\vcpkg\vcpkg install openssl:x64-windows-static
         
     - name: Install MySQL
       run: |
         .\vcpkg\vcpkg install libmysql:x64-windows-static
         
-    - name: Install PostgreSQL
-      run: |
-        .\vcpkg\vcpkg install libpq:x64-windows-static
+    # - name: Install PostgreSQL
+    #   run: |
+    #     .\vcpkg\vcpkg install libpq:x64-windows-static
         
     - name: Copy libraries and Windows SDK
       run: |
@@ -57,7 +57,7 @@ jobs:
         
         # 重命名 OpenSSL 库以匹配 Rust 期望的命名
         copy libs\libcrypto.lib libs\crypto.lib
-        copy libs\libssl.lib libs\ssl.lib
+        # copy libs\libssl.lib libs\ssl.lib
         
         # 重命名 MySQL 库以匹配 Rust 期望的命名
         # copy libs\libmysql.lib libs\mysqlclient.lib
