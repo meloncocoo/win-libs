@@ -20,10 +20,16 @@ jobs:
     - name: Install MySQL libraries
       run: |
         cd vcpkg
-        # 使用正确的包名和版本
+        # 使用正确的包名
         .\vcpkg.exe install mysql-connector-c:x64-windows-static
         # 或者
-        .\vcpkg.exe install mysql:x64-windows-static
+        .\vcpkg.exe install mysql-connector-cpp:x64-windows-static
+        # 或者
+        .\vcpkg.exe install libmysql:x64-windows-static
         
         # 查看实际安装的库文件
-        Get-ChildItem installed\x64-windows-static\lib\*.lib | ForEach-Object { Write-Host $_.Name }
+        if (Test-Path "installed\x64-windows-static\lib") {
+            Get-ChildItem installed\x64-windows-static\lib\*.lib | ForEach-Object { Write-Host $_.Name }
+        } else {
+            echo "No libraries installed"
+        }
