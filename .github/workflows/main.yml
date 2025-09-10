@@ -8,68 +8,13 @@ jobs:
     runs-on: windows-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-              
-    - name: Install vcpkg
-      run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        .\bootstrap-vcpkg.bat
-        
-    - name: Install MySQL
+    - name: Install MySQL libraries
       run: |
         cd vcpkg
-        .\vcpkg.exe install libmysql:x64-windows-static
+        # 使用正确的包名和版本
+        .\vcpkg.exe install mysql-connector-c:x64-windows-static
+        # 或者
+        .\vcpkg.exe install mysql:x64-windows-static
         
-    - name: Install zlib
-      run: |
-        cd vcpkg
-        .\vcpkg.exe install zlib:x64-windows-static
-        
-    - name: Install zstd
-      run: |
-        cd vcpkg
-        .\vcpkg.exe install zstd:x64-windows-static
-        
-    - name: Install OpenSSL
-      run: |
-        cd vcpkg
-        .\vcpkg.exe install openssl:x64-windows-static
-        
-    - name: Copy libraries and Windows SDK
-      run: |
-        mkdir libs
-        # 复制 vcpkg 安装的静态库
-        copy vcpkg\installed\x64-windows-static\lib\*.lib libs\
-        
-        # 重命名 OpenSSL 库以匹配 Rust 期望的命名
-        copy libs\libcrypto.lib libs\crypto.lib
-        copy libs\libssl.lib libs\ssl.lib
-        
-        # 重命名 MySQL 库以匹配 Rust 期望的命名
-        copy libs\libmysql.lib libs\mysqlclient.lib
-        
-        # 复制 Windows SDK 库
-        $sdkPath = "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64\"
-        if (Test-Path $sdkPath) {
-            copy "$sdkPath\ws2_32.lib" libs\
-            copy "$sdkPath\wsock32.lib" libs\
-            copy "$sdkPath\dnsapi.lib" libs\
-            copy "$sdkPath\netapi32.lib" libs\
-        }
-        
-        # 创建 resolv.lib 的符号链接
-        copy libs\ws2_32.lib libs\resolv.lib
-        
-    - name: List all libraries
-      run: |
-        dir libs\
-        echo "=== Library files ==="
-        Get-ChildItem libs\*.lib | ForEach-Object { Write-Host $_.Name }
-        
-    - name: Upload all libraries
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-libs
-        path: libs/
+        # 查看实际安装的库文件
+        Get-ChildItem installed\x64-windows-static\lib\*.lib | ForEach-Object { Write-Host $_.Name }
