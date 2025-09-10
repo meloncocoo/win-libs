@@ -8,12 +8,6 @@ jobs:
     runs-on: windows-latest
     
     steps:
-    - name: Install vcpkg
-      run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        .\bootstrap-vcpkg.bat
- 
     # - name: Cache vcpkg
     #   uses: actions/cache@v4
     #   with:
@@ -29,6 +23,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
               
+    - name: Install vcpkg
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+ 
     # - name: Install zlib
     #   run: |
     #     .\vcpkg\vcpkg.exe install zlib:x64-windows-static
