@@ -1,50 +1,69 @@
-name: Build Windows App
+name: Build Windows Libraries
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch: # 只允许手动触发
 
 jobs:
-  build-windows:
+  build-windows-libs:
     runs-on: windows-latest
     
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-    
-    - name: Setup Rust
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: x86_64-pc-windows-msvc
-    
-    - name: Install MySQL Connector/C
+    - name: Checkout code
+      uses: actions/checkout@v4
+              
+    - name: Install vcpkg
       run: |
-        # 下载 MySQL Connector/C
-        Invoke-WebRequest -Uri "https://dev.mysql.com/get/Downloads/Connector-C/mysql-connector-c-6.1.11-winx64.zip" -OutFile "mysql.zip"
-        Expand-Archive mysql.zip -DestinationPath "mysql"
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
         
-        # 设置环境变量
-        echo "LIB=C:\mysql\lib" >> $env:GITHUB_ENV
-        echo "INCLUDE=C:\mysql\include" >> $env:GITHUB_ENV
-        echo "PATH=C:\mysql\bin;$env:PATH" >> $env:GITHUB_ENV
-    
-    - name: Install dependencies
-      run: npm install
-    
-    - name: Build Tauri app
-      run: npm run tauri build
-      env:
-        RUST_BACKTRACE: 1
-    
-    - name: Upload artifacts
+    - name: Install libraries
+      run: |
+        cd vcpkg
+        .\vcpkg.exe install libmysql:x64-windows-static
+        .\vcpkg.exe install zlib:x64-windows-static
+        .\vcpkg.exe install zstd:x64-windows-static
+        .\vcpkg.exe install openssl:x64-windows-static
+        
+    - name: List installed libraries
+      run: |
+        echo "=== Checking vcpkg installed libraries ==="
+        dir vcpkg\installed\x64-windows-static\lib\
+        echo "=== All .lib files ==="
+        Get-ChildItem vcpkg\installed\x64-windows-static\lib\*.lib | ForEach-Object { Write-Host $_.Name }
+        
+    - name: Copy libraries
+      run: |
+        mkdir libs
+        copy vcpkg\installed\x64-windows-static\lib\*.lib libs\
+        
+        # 检查并重命名文件
+        if (Test-Path "libs\libcrypto.lib") {
+            copy libs\libcrypto.lib libs\crypto.lib
+            Write-Host "Renamed libcrypto.lib to crypto.lib"
+        }
+        if (Test-Path "libs\libssl.lib") {
+            copy libs\libssl.lib libs\ssl.lib
+            Write-Host "Renamed libssl.lib to ssl.lib"
+        }
+        if (Test-Path "libs\libmysql.lib") {
+            copy libs\libmysql.lib libs\mysqlclient.lib
+            Write-Host "Renamed libmysql.lib to mysqlclient.lib"
+        }
+        
+        # 创建 resolv.lib
+        if (Test-Path "libs\ws2_32.lib") {
+            copy libs\ws2_32.lib libs\resolv.lib
+            Write-Host "Created resolv.lib from ws2_32.lib"
+        }
+        
+    - name: List final libraries
+      run: |
+        echo "=== Final library files ==="
+        Get-ChildItem libs\*.lib | ForEach-Object { Write-Host $_.Name }
+        
+    - name: Upload libraries
       uses: actions/upload-artifact@v4
       with:
-        name: windows-app
-        path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/
+        name: windows-libs
+        path: libs/
