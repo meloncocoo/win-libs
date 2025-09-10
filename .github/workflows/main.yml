@@ -8,6 +8,15 @@ jobs:
     runs-on: windows-latest
     
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+              
+    - name: Install vcpkg
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+        
     - name: Install MySQL libraries
       run: |
         cd vcpkg
